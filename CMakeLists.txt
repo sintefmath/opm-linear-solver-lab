@@ -6,6 +6,7 @@ project(
   VERSION 1.0
   LANGUAGES C CXX CUDA)
 option(OPM_REQUIRES_DAMARIS OFF)
+option(OPM_REQUIRES_VEXCL OFF)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
@@ -22,7 +23,9 @@ if (${OPM_REQUIRES_DAMARIS})
   find_package(Damaris REQUIRED)
 endif()
 
-include(VexCLSetup)
+if (${OPM_REQUIRES_VEXCL})
+  include(VexCLSetup)
+endif()
 
 find_package(Boost REQUIRED COMPONENTS program_options thread log log_setup python numpy)
 
