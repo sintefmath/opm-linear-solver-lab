@@ -1,4 +1,4 @@
-# open_matrix_laboratory
+# opm-linear-solver-lab
 Experimental playground for testing out linear solvers in OPM Flow.
 
 ## Compiling
