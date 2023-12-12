@@ -346,6 +346,7 @@ main(int argc, char** argv)
         while (std::getline(matrixfile, line)) {
             if (line.substr(0, lineToFind.size()) == lineToFind) {
                 dim = std::atoi(line.substr(lineToFind.size() + 2).c_str()); // Yeah, max 9
+                break;
             }
         }
     }
