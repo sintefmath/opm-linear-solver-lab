@@ -17,6 +17,7 @@ find_package(dune-grid REQUIRED)
 find_package(dune-geometry REQUIRED)
 find_package(dune-istl REQUIRED)
 find_package(opm-simulators REQUIRED)
+find_package(fmt REQUIRED)
 
 if (${OPM_REQUIRES_DAMARIS})
   find_package(XercesC REQUIRED)
@@ -37,4 +38,4 @@ target_include_directories(linsolverlab PRIVATE
 )
 
 
-target_link_libraries(linsolverlab PRIVATE opmsimulators Boost::program_options CUDA::cudart)
+target_link_libraries(linsolverlab PRIVATE opmsimulators Boost::program_options CUDA::cudart fmt::fmt)
