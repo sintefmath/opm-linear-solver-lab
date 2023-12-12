@@ -44,6 +44,16 @@ you can run cmake as
 cmake .. -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_PREFIX_PATH="$(bash ../build_helpers/prefix_path.sh /some/path/other/path/for/opm/ /some/path/for/dune/dune-common/)"
 ```
+
+### Note on libfmt
+
+You probably need to have libfmt installed. On Ubuntu this can be accomplished by installing
+
+```bash
+sudo apt install libfmt-dev
+```
+
+Alternatively you can manually donwload and install libfmt. Make sure to extend your `CMAKE_PREFIX_PATH` to contain the install directory of libfmt.
 ## Running
 From the build folder, you can run eg. 
 
