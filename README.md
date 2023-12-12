@@ -42,13 +42,13 @@ you can run cmake as
 ```bash
 # from build. 
 cmake .. -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_PREFIX_PATH="$(bash ../build_helpers/prefix_path /some/path/other/path/for/opm/ /some/path/for/dune/dune-common/)"
+    -DCMAKE_PREFIX_PATH="$(bash ../build_helpers/prefix_path.sh /some/path/other/path/for/opm/ /some/path/for/dune/dune-common/)"
 ```
 ## Running
 From the build folder, you can run eg. 
 
 ```bash
-linsolverlab \
+./linsolverlab \
     -x ../examples/matrices/spe1/rhs.mm \
     -y  ../examples/matrices/spe1/rhs.mm  \
     -m  ../examples/matrices/spe1/matrix.mm \
@@ -88,7 +88,7 @@ Example output
 ## Running only preconditioner
 
 ```bash
-linsolverlab \
+./linsolverlab \
     -x ../examples/matrices/spe1/rhs.mm \
     -y  ../examples/matrices/spe1/rhs.mm  \
     -m  ../examples/matrices/spe1/matrix.mm \
