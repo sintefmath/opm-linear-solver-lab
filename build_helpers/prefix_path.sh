@@ -35,7 +35,7 @@ done
 
 for repo in opm-common opm-grid opm-models opm-simulators
 do
-    prefix_path="$prefix_path${basepath}/${repo}/build;${basepath}/build/${repo};"
+    prefix_path="$prefix_path${basepath}/${repo}/build;${basepath}/build/${repo};${basepath}/${repo};"
 done
 
 echo $prefix_path
