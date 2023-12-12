@@ -7,6 +7,8 @@ project(
   LANGUAGES C CXX CUDA)
 option(OPM_REQUIRES_DAMARIS OFF)
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
+
 find_package(CUDAToolkit REQUIRED)
 find_package(TBB REQUIRED)
 find_package(dune-common REQUIRED)
@@ -19,6 +21,8 @@ if (${OPM_REQUIRES_DAMARIS})
   find_package(XercesC REQUIRED)
   find_package(Damaris REQUIRED)
 endif()
+
+include(VexCLSetup)
 
 find_package(Boost REQUIRED COMPONENTS program_options thread log log_setup python numpy)
 
