@@ -8,7 +8,7 @@ project(
 option(OPM_REQUIRES_DAMARIS OFF)
 option(OPM_REQUIRES_VEXCL OFF)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
 find_package(CUDAToolkit REQUIRED)
 find_package(TBB REQUIRED)
