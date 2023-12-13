@@ -18,6 +18,7 @@ find_package(dune-geometry REQUIRED)
 find_package(dune-istl REQUIRED)
 find_package(opm-simulators REQUIRED)
 find_package(fmt REQUIRED)
+find_package(Petsc)
 
 if (${OPM_REQUIRES_DAMARIS})
   find_package(XercesC REQUIRED)
@@ -39,3 +40,9 @@ target_include_directories(linsolverlab PRIVATE
 
 
 target_link_libraries(linsolverlab PRIVATE opmsimulators Boost::program_options CUDA::cudart fmt::fmt)
+
+if(Petsc_FOUND)
+  add_executable(linearsolverlab_petsc src/petsc.cpp)
+  target_include_directories(linearsolverlab_petsc PRIVATE ${PETSC_INCLUDE_DIRS} ${opm-simulators_INCLUDE_DIRS})
+  target_link_libraries(linearsolverlab_petsc PRIVATE ${PETSC_LIBRARIES} fmt::fmt Boost::program_options ${opm-simulators_LIBRARIES})
+endif()
