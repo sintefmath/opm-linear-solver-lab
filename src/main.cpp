@@ -27,6 +27,47 @@
 
 #include <boost/program_options.hpp>
 
+#include "read_binary.hpp"
+
+template <class VectorType>
+VectorType
+readVector(const std::string& filename)
+{
+    if (filename.ends_with(".mm")) {
+        VectorType vector;
+        Dune::loadMatrixMarket(vector, filename);
+        return vector;
+    } else if (filename.ends_with(".bin")) {
+        return readBinaryAMGCLVector<VectorType>(filename);
+    } else {
+        throw std::runtime_error(
+            fmt::format("Unsupported file format: {}.\n\nSupported: .mm, .bin (CASE SENSITIVE!).", filename));
+    }
+}
+
+
+template <class MatrixType>
+MatrixType
+readMatrix(const std::string& filename)
+{
+    if (filename.ends_with(".mm")) {
+        MatrixType matrix;
+
+        // TODO: Can this be done nicer?
+        using real = typename MatrixType::block_type::field_type;
+        constexpr int blockDim = MatrixType::block_type::rows;
+        using MatrixDuneIsExpecting = Dune::BCRSMatrix<Dune::FieldMatrix<real, blockDim, blockDim>>;
+
+        Dune::loadMatrixMarket(reinterpret_cast<MatrixDuneIsExpecting&>(matrix), filename);
+        return matrix;
+    } else if (filename.ends_with(".bin")) {
+        return readBinaryAMGCLMatrix<MatrixType>(filename);
+    } else {
+        throw std::runtime_error(
+            fmt::format("Unsupported file format: {}.\n\nSupported: .mm, .bin (CASE SENSITIVE!).", filename));
+    }
+}
+
 template <class X>
 class OnlyPreconditionSolver : public Dune::IterativeSolver<X, X>
 {
@@ -77,17 +118,15 @@ readAndSolveCPU(const auto jsonConfigCPUFilename,
         transpose = true;
     }
 
-    SpMatrix B;
-    Vector x, rhs;
-
-    using MatrixDuneIsExpecting = Dune::BCRSMatrix<Dune::FieldMatrix<double, dim, dim>>;
-
-    Dune::loadMatrixMarket(reinterpret_cast<MatrixDuneIsExpecting&>(B), matrixFilename);
-    Dune::loadMatrixMarket(x, xFilename);
-    Dune::loadMatrixMarket(rhs, rhsFilename);
+    auto B = readMatrix<SpMatrix>(matrixFilename);
+    auto x = readVector<Vector>(xFilename);
+    auto rhs = readVector<Vector>(xFilename);
     auto BCPUOperator = std::make_shared<Dune::MatrixAdapter<SpMatrix, Vector, Vector>>(B);
 
-    auto wc = []() -> Vector { throw std::runtime_error("getQuasiImpesWeights is not supported in the benchmarking library."); return Vector(); };
+    auto wc = []() -> Vector {
+        throw std::runtime_error("getQuasiImpesWeights is not supported in the benchmarking library.");
+        return Vector();
+    };
 
 
     const size_t N = B.N();
@@ -108,10 +147,9 @@ readAndSolveCPU(const auto jsonConfigCPUFilename,
     solverCPU.apply(x, rhs, resultCPU);
     auto cpuEnd = std::chrono::high_resolution_clock::now();
 
-    
+
     const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(cpuEnd - cpuStart);
     return std::make_tuple(duration.count(), resultCPU, false);
-    
 }
 template <int dim, template <class> class Solver = Dune::BiCGSTABSolver, class T = double>
 std::tuple<unsigned long long, Dune::InverseOperatorResult, bool>
@@ -130,17 +168,16 @@ readAndSolveGPU(const auto jsonConfigGPUFilename,
 
     Opm::PropertyTree configurationGPU(jsonConfigGPUFilename);
 
-    SpMatrix B;
-    Vector x, rhs;
+    auto B = readMatrix<SpMatrix>(matrixFilename);
+    auto x = readVector<Vector>(xFilename);
+    auto rhs = readVector<Vector>(xFilename);
 
-    using MatrixDuneIsExpecting = Dune::BCRSMatrix<Dune::FieldMatrix<double, dim, dim>>;
-
-    Dune::loadMatrixMarket(reinterpret_cast<MatrixDuneIsExpecting&>(B), matrixFilename);
-    Dune::loadMatrixMarket(x, xFilename);
-    Dune::loadMatrixMarket(rhs, rhsFilename);
     auto BCPUOperator = std::make_shared<Dune::MatrixAdapter<SpMatrix, Vector, Vector>>(B);
 
-     auto wc = []() -> Vector { throw std::runtime_error("getQuasiImpesWeights is not supported in the benchmarking library."); return Vector(); };
+    auto wc = []() -> Vector {
+        throw std::runtime_error("getQuasiImpesWeights is not supported in the benchmarking library.");
+        return Vector();
+    };
 
 
 
@@ -195,7 +232,9 @@ readAndSolveGPU(const auto jsonConfigGPUFilename,
     return std::make_tuple(duration.count(), result, gpufailed);
 }
 
-boost::property_tree::ptree makeTree(const std::tuple<unsigned long long, Dune::InverseOperatorResult, bool>& resultstuple) {
+boost::property_tree::ptree
+makeTree(const std::tuple<unsigned long long, Dune::InverseOperatorResult, bool>& resultstuple)
+{
     boost::property_tree::ptree tree;
     auto [runtime, result, failed] = resultstuple;
     tree.add("runtime", runtime);
@@ -282,7 +321,8 @@ main(int argc, char** argv)
         "initial-guess-file,x", po::value<std::string>()->required(), "x (initial guess) filename.")(
         "rhs-file,y", po::value<std::string>()->required(), "y (right hand side) filename.")(
         "configfile-cpu,c", po::value<std::string>(), "Configuration file for the linear solver on the CPU (.json)")(
-        "configfile-gpu,g", po::value<std::string>(), "Configuration file for the linear solver on the GPU (.json)");
+        "configfile-gpu,g", po::value<std::string>(), "Configuration file for the linear solver on the GPU (.json)")(
+        "block-size,b", po::value<size_t>(), "Block size to use. This is required for binary files.");
 
     po::variables_map vm;
 
@@ -339,7 +379,9 @@ main(int argc, char** argv)
     }
 
     size_t dim = 2;
-    {
+    if (vm.count("block-size")) {
+        dim = vm["block-size"].as<size_t>();
+    } else if (matrixFilename.ends_with(".mm")) {
         std::ifstream matrixfile(matrixFilename);
         std::string line;
         const std::string lineToFind = "% ISTL_STRUCT blocked";
@@ -349,6 +391,10 @@ main(int argc, char** argv)
                 break;
             }
         }
+    } else {
+        std::cerr << "You have to specify a .mm (ascii) matrix file or specify --block-size\n";
+        std::cout << desc << "\n";
+        std::exit(EXIT_FAILURE);
     }
 
     switch (dim) {
