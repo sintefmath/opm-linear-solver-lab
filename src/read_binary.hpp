@@ -21,7 +21,7 @@ readBinaryAMGCLMatrix(const std::string& filepath)
     constexpr int blockRows = MatrixType::block_type::rows;
     constexpr int blockCols = MatrixType::block_type::cols;
 
-    if (nScalar % blockRows != 0 || blockCols % blockCols != 0) {
+    if (nScalar % blockRows != 0 || nScalar % blockCols != 0) {
         throw std::runtime_error(fmt::format(
             "Unexpected matrix size. Got n={}, blockRows = {}, blockCols = {}.", nScalar, blockRows, blockCols));
     }
