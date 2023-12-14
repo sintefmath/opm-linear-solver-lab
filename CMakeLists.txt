@@ -21,18 +21,18 @@ find_package(fmt REQUIRED)
 find_package(Petsc)
 find_package(amgcl)
 
-if (${amgcl_FOUND})
+if (amgcl_FOUND)
     SET(HAVE_AMGCL ON)
 else()
     SET(HAVE_AMGCL OFF)
 endif()
 
-if (${OPM_REQUIRES_DAMARIS})
+if (OPM_REQUIRES_DAMARIS)
   find_package(XercesC REQUIRED)
   find_package(Damaris REQUIRED)
 endif()
 
-if (${OPM_REQUIRES_VEXCL})
+if (OPM_REQUIRES_VEXCL)
   include(VexCLSetup)
 endif()
 
