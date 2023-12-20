@@ -34,3 +34,6 @@
 # installation
 installdir
 build
+
+# generated data
+benchmark_results

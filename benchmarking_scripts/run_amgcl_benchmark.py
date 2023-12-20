@@ -69,20 +69,18 @@ if __name__ == "__main__":
         'examples/configurations/amgcl/amgcl_cpr_drs_setup.json',
         'examples/configurations/amgcl/amgcl_cpr_drs_setup.json -b 2'
     ]
-    #matrix_root = 'matrices'
-    #matrix_root = "/media/jakob/Ultra Touch/matrices"
     matrix_root = "examples/matrices"
     commands = {
         'solver': 'CPU',
         'solver_cuda': 'CUDA',
-        'solver_vexcl_cuda': 'VEXCL CUDA',
-        'cpr_drs': 'CPU (CPR DRS)',
-        'cpr_drs_cuda': 'CUDA (CPR DRS)',
-        'cpr_drs_vexcl_cuda': 'VEXCL CUDA (CPR DRS)'
+        #'solver_vexcl_cuda': 'VEXCL CUDA',
+        #'cpr_drs': 'CPU (CPR DRS)',
+        #'cpr_drs_cuda': 'CUDA (CPR DRS)',
+        #'cpr_drs_vexcl_cuda': 'VEXCL CUDA (CPR DRS)'
     }
-    limit = 1  # Adjust this to change the number of matrices processed per directory
+    limit = 10  # Adjust this to change the number of matrices processed per directory
 
     binary = "/home/jakob/code/amgcl/build/examples"
-    results_directory = 'benchmark_results'
+    results_directory = 'benchmark_results/amgcl'
     subfolders = sys.argv[1:]  # Get subfolder names from command-line arguments
-    main(binary,results_directory, json_files, matrix_root, commands, subfolders, limit)
+    main(binary, results_directory, json_files, matrix_root, commands, subfolders, limit)

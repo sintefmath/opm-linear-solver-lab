@@ -56,16 +56,15 @@ def main(binary, results_directory, json_files, matrix_root, subfolders, limit=N
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python script.py <subfolder1> [<subfolder2> ...]")
+        print("Usage: python run_opm_benchmark.py <subfolder1> [<subfolder2> ...]")
         sys.exit(1)
 
     json_files = [
         'examples/configurations/cpu/dilu.json --block-size 2',
         'examples/configurations/cpu/ilu0.json --block-size 2',
-        'examples/configurations/gpu/cuilu0.json --block-size 2'
+        'examples/configurations/gpu/cuilu0.json --block-size 2',
+        'examples/configurations/gpu/cudilu.json --block-size 2'
     ]
-    #matrix_root = 'matrices'
-    #matrix_root = "/media/jakob/Ultra Touch/matrices"
     matrix_root = "./examples/matrices"
     limit = 10  # Adjust this to change the number of matrices processed per directory
 

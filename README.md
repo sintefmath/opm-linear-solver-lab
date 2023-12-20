@@ -132,3 +132,38 @@ Example output
 }
 
 ```
+
+
+## Running benchmarks
+
+
+### OPM-flow
+
+
+Generating benchmark data
+
+```python
+# usage: run_opm_benchmark.py <subfolder1> [<subfolder2> ...]
+python benchmarking_scripts/run_opm_benchmark.py sleipner
+```
+
+Adjusting the experiment in the file
+
+```python
+    json_files = [
+        'examples/configurations/cpu/dilu.json --block-size 2',
+        'examples/configurations/cpu/ilu0.json --block-size 2',
+        'examples/configurations/gpu/cuilu0.json --block-size 2',
+        'examples/configurations/gpu/cudilu.json --block-size 2'
+    ]
+    matrix_root = "./examples/matrices"  # folder where the matrix files can be found
+    limit = 10  # Adjust this to change the number of matrices processed per directory
+```
+
+
+
+Plotting the results
+
+```python
+python benchmarking_scripts/process_and_plot_opm.py
+```
