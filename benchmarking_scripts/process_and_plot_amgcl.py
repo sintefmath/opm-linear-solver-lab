@@ -83,8 +83,8 @@ if __name__ == "__main__":
     for subfolder in subfolders:
         subfolder_path = os.path.join(benchmark_results_dir, subfolder)
         if os.path.isdir(subfolder_path):
-            per_iter_data = process_data(subfolder_path)  # Modify to also include error data
-            plotting.plot_and_save(name, subfolder_path, subfolder, json_files, per_iter_data['times'], CPU_commands)
+            per_iter_data = process_data(subfolder_path)
+            plotting.plot_and_save_time_per_iter(name, subfolder_path, subfolder, json_files, per_iter_data['times'], CPU_commands)
             plotting.plot_and_save_solve(name, subfolder_path, subfolder, json_files, per_iter_data['solve_time'], CPU_commands)
             plotting.plot_and_save_iter(name, subfolder_path, subfolder, json_files, per_iter_data['iterations'], CPU_commands)
             plotting.plot_time_histogram(name, subfolder_path, subfolder, json_files, per_iter_data['times'], CPU_commands)
@@ -95,8 +95,8 @@ if __name__ == "__main__":
     for subfolder in subfolders:
         subfolder_path = os.path.join(benchmark_results_dir, subfolder)
         if os.path.isdir(subfolder_path):
-            per_iter_data = process_data(subfolder_path)  # Modify to also include error data
-            plotting.plot_and_save(name, subfolder_path, subfolder, json_files, per_iter_data['times'], GPU_commands)
+            per_iter_data = process_data(subfolder_path)
+            plotting.plot_and_save_time_per_iter(name, subfolder_path, subfolder, json_files, per_iter_data['times'], GPU_commands)
             plotting.plot_and_save_solve(name, subfolder_path, subfolder, json_files, per_iter_data['solve_time'], GPU_commands)
             plotting.plot_and_save_iter(name, subfolder_path, subfolder, json_files, per_iter_data['iterations'], GPU_commands)
             plotting.plot_time_histogram(name, subfolder_path, subfolder, json_files, per_iter_data['times'], GPU_commands)
@@ -108,8 +108,8 @@ if __name__ == "__main__":
     for subfolder in subfolders:
         subfolder_path = os.path.join(benchmark_results_dir, subfolder)
         if os.path.isdir(subfolder_path):
-            per_iter_data = process_data(subfolder_path)  # Modify to also include error data
-            plotting.plot_and_save(name, subfolder_path, subfolder, json_files, per_iter_data['times'], all_commands)
+            per_iter_data = process_data(subfolder_path)
+            plotting.plot_and_save_time_per_iter(name, subfolder_path, subfolder, json_files, per_iter_data['times'], all_commands)
             plotting.plot_and_save_solve(name, subfolder_path, subfolder, json_files, per_iter_data['solve_time'], all_commands)
             plotting.plot_and_save_iter(name, subfolder_path, subfolder, json_files, per_iter_data['iterations'], all_commands)
             plotting.plot_time_histogram(name, subfolder_path, subfolder, json_files, per_iter_data['times'], all_commands)

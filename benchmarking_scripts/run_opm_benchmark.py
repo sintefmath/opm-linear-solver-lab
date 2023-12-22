@@ -60,8 +60,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     json_files = [
-        'examples/configurations/cpu/dilu.json --block-size 2',
         'examples/configurations/cpu/ilu0.json --block-size 2',
+        'examples/configurations/cpu/dilu.json --block-size 2',
         'examples/configurations/gpu/cuilu0.json --block-size 2',
         'examples/configurations/gpu/cudilu.json --block-size 2'
     ]

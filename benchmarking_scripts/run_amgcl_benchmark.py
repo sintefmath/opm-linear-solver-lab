@@ -15,7 +15,6 @@ def main(binary, results_directory, json_files, matrix_root, commands, subfolder
     # Process only specified subfolders
     for subfolder in subfolders:
         matrix_path = os.path.join(matrix_root, subfolder)
-        #matrix_path = os.path.join(matrix_path, "reports")
         if not os.path.isdir(matrix_path):
             print(f"Directory not found: {matrix_path}")
             continue

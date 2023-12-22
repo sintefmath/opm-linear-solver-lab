@@ -46,8 +46,8 @@ def process_data(matrix_directory):
 
 if __name__ == "__main__":
     json_files = [
-        'examples/configurations/cpu/dilu.json --block-size 2',
         'examples/configurations/cpu/ilu0.json --block-size 2',
+        'examples/configurations/cpu/dilu.json --block-size 2',
         'examples/configurations/gpu/cuilu0.json --block-size 2',
         'examples/configurations/gpu/cudilu.json --block-size 2'
     ]
@@ -71,7 +71,7 @@ if __name__ == "__main__":
         subfolder_path = os.path.join(benchmark_results_dir, subfolder)
         if os.path.isdir(subfolder_path):
             per_iter_data = process_data(subfolder_path)
-            plotting.plot_and_save(name, subfolder_path, subfolder, json_files, per_iter_data['times'], CPU_commands)
+            plotting.plot_and_save_time_per_iter(name, subfolder_path, subfolder, json_files, per_iter_data['times'], CPU_commands)
             plotting.plot_and_save_solve(name, subfolder_path, subfolder, json_files, per_iter_data['solve_time'], CPU_commands)
             plotting.plot_and_save_iter(name, subfolder_path, subfolder, json_files, per_iter_data['iterations'], CPU_commands)
             plotting.plot_time_histogram(name, subfolder_path, subfolder, json_files, per_iter_data['times'], CPU_commands)
@@ -83,7 +83,7 @@ if __name__ == "__main__":
         subfolder_path = os.path.join(benchmark_results_dir, subfolder)
         if os.path.isdir(subfolder_path):
             per_iter_data = process_data(subfolder_path)
-            plotting.plot_and_save(name, subfolder_path, subfolder, json_files, per_iter_data['times'], GPU_commands)
+            plotting.plot_and_save_time_per_iter(name, subfolder_path, subfolder, json_files, per_iter_data['times'], GPU_commands)
             plotting.plot_and_save_solve(name, subfolder_path, subfolder, json_files, per_iter_data['solve_time'], GPU_commands)
             plotting.plot_and_save_iter(name, subfolder_path, subfolder, json_files, per_iter_data['iterations'], GPU_commands)
             plotting.plot_time_histogram(name, subfolder_path, subfolder, json_files, per_iter_data['times'], GPU_commands)
@@ -96,7 +96,7 @@ if __name__ == "__main__":
         subfolder_path = os.path.join(benchmark_results_dir, subfolder)
         if os.path.isdir(subfolder_path):
             per_iter_data = process_data(subfolder_path)
-            plotting.plot_and_save(name, subfolder_path, subfolder, json_files, per_iter_data['times'], all_commands)
+            plotting.plot_and_save_time_per_iter(name, subfolder_path, subfolder, json_files, per_iter_data['times'], all_commands)
             plotting.plot_and_save_solve(name, subfolder_path, subfolder, json_files, per_iter_data['solve_time'], all_commands)
             plotting.plot_and_save_iter(name, subfolder_path, subfolder, json_files, per_iter_data['iterations'], all_commands)
             plotting.plot_time_histogram(name, subfolder_path, subfolder, json_files, per_iter_data['times'], all_commands)
