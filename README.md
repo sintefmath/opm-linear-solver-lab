@@ -151,8 +151,8 @@ Adjusting the experiment in the file
 
 ```python
     json_files = [
-        'examples/configurations/cpu/dilu.json --block-size 2',
         'examples/configurations/cpu/ilu0.json --block-size 2',
+        'examples/configurations/cpu/dilu.json --block-size 2',
         'examples/configurations/gpu/cuilu0.json --block-size 2',
         'examples/configurations/gpu/cudilu.json --block-size 2'
     ]
@@ -171,3 +171,5 @@ python benchmarking_scripts/process_and_plot_opm.py
 Example output:
 
 ![CPU+GPU Sleipner Average Time Per Iteration](examples/plots/CPU+GPU_sleipner_average_time_per_iteration.png)
+
+![CPU+GPU Sleipner Time per Iteration Histogram](examples/plots/GPU_sleipner_time_per_iteration_histogram.png)
