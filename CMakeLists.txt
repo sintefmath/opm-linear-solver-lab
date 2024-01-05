@@ -68,13 +68,17 @@ if (HAVE_AMGCL)
       ${CMAKE_CURRENT_BINARY_DIR}/include
     )
 
-    target_link_libraries(test_read_binary PRIVATE opmsimulators Boost::program_options Boost::unit_test_framework amgcl::amgcl CUDA::cudart fmt::fmt)
+    target_link_libraries(test_read_binary PRIVATE opmsimulators Boost::program_options Boost::unit_test_framework amgcl::amgcl fmt::fmt)
 
 endif()
 
 if(Petsc_FOUND)
   add_executable(linearsolverlab_petsc src/petsc.cpp)
-  target_include_directories(linearsolverlab_petsc PRIVATE ${PETSC_INCLUDE_DIRS} ${opm-simulators_INCLUDE_DIRS})
+  target_include_directories(linearsolverlab_petsc PRIVATE
+                             ${PETSC_INCLUDE_DIRS}
+                             ${opm-simulators_INCLUDE_DIRS}
+                             ${CMAKE_CURRENT_BINARY_DIR}/include)
   target_link_libraries(linearsolverlab_petsc PRIVATE ${PETSC_LIBRARIES} fmt::fmt Boost::program_options ${opm-simulators_LIBRARIES})
+    target_compile_features(linearsolverlab_petsc PRIVATE cxx_std_20)
 endif()
 

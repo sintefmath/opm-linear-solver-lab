@@ -1,8 +1,14 @@
+#include <config.hpp>
+
 #include <petscksp.h>
 #include <petscconf.h>
 
 #ifndef PETSC_HAVE_MPIUNI
 #define HAVE_MPI 1
+#endif
+
+#if HAVE_AMGCL
+#include <amgcl/io/binary.hpp>
 #endif
 
 #include <boost/program_options.hpp>
@@ -71,13 +77,57 @@ Mat readMatrix(const std::string& path)
             int i, j;
             double val;
             str >> i >> j >> val;
-             MatSetValue(A, i-1, j-1, val, INSERT_VALUES);
+            MatSetValue(A, i-1, j-1, val, INSERT_VALUES);
         }
     }
     MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);
     MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY);
 
     return A;
+}
+
+Mat readBinaryMatrix(const std::string& path, const int bs)
+{
+#if HAVE_AMGCL
+    Mat A;
+    MatCreate(PETSC_COMM_WORLD, &A);
+    MatSetFromOptions(A);
+
+    Opm::Parallel::Communication comm(PETSC_COMM_WORLD);
+
+    std::vector<std::ptrdiff_t> ptr;
+    std::vector<std::ptrdiff_t> col;
+    std::vector<double> val;
+    std::array<std::size_t,2> info;
+
+    OPM_BEGIN_PARALLEL_TRY_CATCH()
+    if (comm.rank() == 0) {
+        amgcl::io::read_crs(path, info[0], ptr, col, val);
+        info[1] = ptr.back();
+    }
+    OPM_END_PARALLEL_TRY_CATCH("readMatrix", comm);
+
+    comm.broadcast(info.data(), 2, 0);
+    MatSetSizes(A, PETSC_DECIDE, PETSC_DECIDE, info[0], info[0]);
+    MatMPIAIJSetPreallocation(A, info[1] / info[0], PETSC_NULLPTR, info[1] / info[0], PETSC_NULLPTR);
+    MatSetBlockSizes(A, bs, bs);
+    MatSetUp(A);
+    MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+
+    if (comm.rank() == 0) {
+        for (std::size_t i = 0; i < info[0]; ++i) {
+            for (auto scalarColumnPtr = ptr[i]; scalarColumnPtr < ptr[i + 1]; ++scalarColumnPtr) {
+                MatSetValue(A, i, col[scalarColumnPtr], val[scalarColumnPtr], INSERT_VALUES);
+            }
+        }
+    }
+    MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);
+    MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY);
+
+    return A;
+#else
+    throw std::runtime_error("You need to compile with amgcl to get binary support");
+#endif
 }
 
 Vec readVector(const std::string& path)
@@ -148,6 +198,48 @@ Vec readVector(const std::string& path)
     return b;
 }
 
+Vec readBinaryVector(const std::string& path, const int bs)
+{
+#if HAVE_AMGCL
+    Vec b;
+    VecCreate(PETSC_COMM_WORLD, &b);
+    VecSetFromOptions(b);
+
+    Opm::Parallel::Communication comm(PETSC_COMM_WORLD);
+
+    std::array<std::size_t,2> info;
+    std::vector<double> val;
+
+    OPM_BEGIN_PARALLEL_TRY_CATCH()
+    if (comm.rank() == 0) {
+        amgcl::io::read_dense(path, info[0], info[1], val);
+        if (info[1] != 1) {
+            throw std::runtime_error("Unexpected m value " + std::to_string(info[1]));
+        }
+    }
+    OPM_END_PARALLEL_TRY_CATCH("readVector", comm);
+
+    comm.broadcast(info.data(), 2, 0);
+    VecSetSizes(b, PETSC_DECIDE, info[0]);
+    VecSetBlockSize(b, bs);
+    VecSetFromOptions(b);
+    VecSetUp(b);
+
+    if (comm.rank() == 0) {
+        for (std::size_t i = 0; i < info[0]; ++i) {
+            VecSetValue(b, i, val[i], INSERT_VALUES);
+        }
+    }
+
+    VecAssemblyBegin(b);
+    VecAssemblyEnd(b);
+
+    return b;
+#else
+    throw std::runtime_error("You need to compile with amgcl to get binary support");
+#endif
+}
+
 int main(int argc, char** argv)
 {
     namespace po = boost::program_options;
@@ -155,7 +247,8 @@ int main(int argc, char** argv)
     desc.add_options()("help", "Produce this help message.")(
         "matrix-file,m", po::value<std::string>()->required(), "Matrix filename.")(
         "initial-guess-file,x", po::value<std::string>()->default_value(""), "x (initial guess) filename.")(
-        "rhs-file,y", po::value<std::string>()->required(), "y (right hand side) filename.");
+        "rhs-file,y", po::value<std::string>()->required(), "y (right hand side) filename.")(
+        "block-size,b", po::value<int>()->default_value(1), "Block size to use. This is recommended for binary files.");
 
     po::variables_map vm;
 
@@ -194,14 +287,21 @@ int main(int argc, char** argv)
     const auto matrixFilename = vm["matrix-file"].as<std::string>();
     const auto xFilename = vm["initial-guess-file"].as<std::string>();
     const auto rhsFilename = vm["rhs-file"].as<std::string>();
+    int bs = 1;
+    if (vm.count("block-size")) {
+        bs = vm["block-size"].as<int>();
+    }
 
     PetscInitialize(&argc, &argv, 0, PETSC_NULLPTR);
 
-    Mat A = readMatrix(matrixFilename);
-    Vec b = readVector(rhsFilename);
+    Mat A = matrixFilename.ends_with("mm") ? readMatrix(matrixFilename)
+                                           : readBinaryMatrix(matrixFilename, bs);
+    Vec b = rhsFilename.ends_with("mm") ? readVector(rhsFilename)
+                                        : readBinaryVector(rhsFilename, bs);
     Vec x;
     if (!xFilename.empty())
-        x = readVector(xFilename);
+        x = xFilename.ends_with("mm") ? readVector(xFilename)
+                                      : readBinaryVector(xFilename, bs);
     else {
         VecDuplicate(b, &x);
     }
