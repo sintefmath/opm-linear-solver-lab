@@ -1,0 +1,11 @@
+{
+    "precond": {
+        "class": "relaxation",
+        "type": "spai0"
+    },
+    "solver": {
+        "type": "bicgstab",
+        "tol": "0.01",
+        "maxiter": "200"
+    }
+}

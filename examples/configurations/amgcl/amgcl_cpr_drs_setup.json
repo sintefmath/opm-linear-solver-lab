@@ -1,0 +1,36 @@
+{
+    "precond": {
+      "active_rows": "0",
+      "sprecond": {
+        "type": "ilu0",
+        "damping": "1"
+      },
+      "pprecond": {
+        "npost": "1",
+        "relax": {
+          "type": "ilu0",
+          "damping": "1"
+        },
+        "ncycle": "1",
+        "direct_coarse": "true",
+        "coarsening": {
+          "over_interp": "1.5",
+          "type": "aggregation",
+          "aggr": {
+            "eps_strong": "0.25"
+          }
+        },
+        "npre": "1",
+        "pre_cycles": "1"
+      },
+      "eps_dd": "0.00020000000000000001",
+      "eps_ps": "0.02"
+    },
+    "solver": {
+      "type": "bicgstab",
+      "tol": "10e-13",
+      "maxiter": "200"
+    },
+    "verbosity": 3
+  }
+  

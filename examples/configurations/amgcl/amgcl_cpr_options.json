@@ -1,0 +1,7 @@
+{
+    "solver": {
+        "type": "bicgstab",
+        "tol": "0.01",
+        "maxiter": "200"
+    }
+}
