@@ -64,7 +64,7 @@ if (HAVE_AMGCL)
     target_include_directories(test_read_binary PRIVATE
       # Does not seem like these are incluced in any target? Doing it the old fashioned way...
       ${opm-simulators_INCLUDE_DIRS}
-      ${CMAKE_SOURCE_DIR}/src
+      ${CMAKE_CURRENT_SOURCE_DIR}/src
       ${CMAKE_CURRENT_BINARY_DIR}/include
     )
 
