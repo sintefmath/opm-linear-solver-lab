@@ -7,16 +7,16 @@
 #include <dune/istl/matrixmarket.hh>
 
 
-BOOST_AUTO_TEST_CASE(TestSPE1ReadMatrix)
+BOOST_AUTO_TEST_CASE(ReadMatrix)
 {
     constexpr int blockSize = 3;
     using MatrixType = Dune::BCRSMatrix<Dune::FieldMatrix<double, blockSize, blockSize>>;
 
-    auto matrixFromBinary = readBinaryAMGCLMatrix<MatrixType>("../examples/matrices/spe1/matrix.bin");
+    auto matrixFromBinary = readBinaryAMGCLMatrix<MatrixType>("matrix.bin");
 
     MatrixType matrixFromMM;
 
-    Dune::loadMatrixMarket(matrixFromMM, "../examples/matrices/spe1/matrix.mm");
+    Dune::loadMatrixMarket(matrixFromMM, "matrix.mm");
 
     BOOST_REQUIRE_EQUAL(matrixFromBinary.N(), matrixFromMM.N());
     BOOST_REQUIRE_EQUAL(matrixFromBinary.nonzeroes(), matrixFromMM.nonzeroes());
@@ -34,16 +34,16 @@ BOOST_AUTO_TEST_CASE(TestSPE1ReadMatrix)
     }
 }
 
-BOOST_AUTO_TEST_CASE(TestSPE1ReadVector)
+BOOST_AUTO_TEST_CASE(ReadVector)
 {
     constexpr int blockSize = 3;
     using VectorType = Dune::BlockVector<Dune::FieldVector<double, blockSize>>;
 
-    auto vectorFromBinary = readBinaryAMGCLVector<VectorType>("../examples/matrices/spe1/rhs.bin");
+    auto vectorFromBinary = readBinaryAMGCLVector<VectorType>("rhs.bin");
 
     VectorType vectorFromMM;
 
-    Dune::loadMatrixMarket(vectorFromMM, "../examples/matrices/spe1/rhs.mm");
+    Dune::loadMatrixMarket(vectorFromMM, "rhs.mm");
 
     BOOST_REQUIRE_EQUAL(vectorFromMM.N(), vectorFromBinary.N());
 

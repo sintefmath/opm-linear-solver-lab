@@ -47,7 +47,7 @@ add_executable(linsolverlab src/main.cpp
 
 target_compile_features(linsolverlab PRIVATE cxx_std_20)
 target_include_directories(linsolverlab PRIVATE 
-  # Does not seem like these are incluced in any target? Doing it the old fashioned way...
+  # Does not seem like these are included in any target? Doing it the old fashioned way...
   ${opm-simulators_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}/include
 )
@@ -57,19 +57,21 @@ target_link_libraries(linsolverlab PRIVATE opmsimulators Boost::program_options 
 if (HAVE_AMGCL)
     target_link_libraries(linsolverlab PRIVATE opmsimulators amgcl::amgcl)
 
-
     add_executable(test_read_binary tests/test_read_binary.cpp)
     target_compile_features(test_read_binary PRIVATE cxx_std_20)
 
     target_include_directories(test_read_binary PRIVATE
-      # Does not seem like these are incluced in any target? Doing it the old fashioned way...
+      # Does not seem like these are included in any target? Doing it the old fashioned way...
       ${opm-simulators_INCLUDE_DIRS}
       ${CMAKE_CURRENT_SOURCE_DIR}/src
       ${CMAKE_CURRENT_BINARY_DIR}/include
     )
 
+    enable_testing()
     target_link_libraries(test_read_binary PRIVATE opmsimulators Boost::program_options Boost::unit_test_framework amgcl::amgcl fmt::fmt)
 
+    add_test(NAME read_binary+spe1 COMMAND test_read_binary
+             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/examples/matrices/spe1)
 endif()
 
 if(Petsc_FOUND)
